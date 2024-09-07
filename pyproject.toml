@@ -1,16 +1,18 @@
 [tool.poetry]
-name = "cs276"
-version = "0.1.0"
-description = ""
 authors = ["jlondonobo <j.londonobo@gmail.com>"]
+description = ""
+name = "BSBI"
 readme = "README.md"
+version = "0.1.0"
+
 
 [tool.poetry.dependencies]
-python = "^3.12"
 jupyter = "^1.1.1"
 psutil = "^6.0.0"
-
+pytest = "^8.3.2"
+python = "^3.12"
+tqdm = "^4.66.5"
 
 [build-system]
-requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
