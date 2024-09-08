@@ -63,7 +63,7 @@ class BSBIIndex:
         then saves the id maps and calls merge on the intermediate indices
         """
         dirs = [obj for obj in self.data_dir.iterdir() if obj.is_dir()]
-        for block_dir_relative in dirs:
+        for block_dir_relative in sorted(dirs):
             td_pairs = self.parse_block(block_dir_relative)
             index_id = "index_" + block_dir_relative.name
             self.intermediate_indices.append(index_id)
