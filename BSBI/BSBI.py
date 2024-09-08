@@ -63,7 +63,7 @@ class BSBIIndex:
         then saves the id maps and calls merge on the intermediate indices
         """
         dirs = [obj for obj in self.data_dir.iterdir() if obj.is_dir()]
-        for block_dir_relative in tqdm(sorted(dirs)):
+        for block_dir_relative in dirs:
             td_pairs = self.parse_block(block_dir_relative)
             index_id = "index_" + block_dir_relative.name
             self.intermediate_indices.append(index_id)
@@ -110,7 +110,7 @@ class BSBIIndex:
         These persist across calls to parse_block
         """
         pair_collection = []
-        for file in sorted(block_dir.iterdir()):
+        for file in tqdm(sorted(block_dir.iterdir())):
             file_str = file.relative_to(block_dir.parent)
             doc_id = self.doc_id_map[str(file_str)]
             terms = set(file.read_text().split())
