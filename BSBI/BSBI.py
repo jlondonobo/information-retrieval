@@ -213,7 +213,11 @@ class BSBIIndex:
 
         postings_lists = []
 
-        with InvertedIndexMapper(self.index_name, directory=self.output_dir) as index:
+        with InvertedIndexMapper(
+            self.index_name,
+            postings_encoding=self.postings_encoding,
+            directory=self.output_dir,
+        ) as index:
             for term in query_terms:
                 term_id = self.term_id_map[term]
                 postings = index[term_id]

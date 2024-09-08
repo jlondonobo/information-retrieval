@@ -18,11 +18,11 @@ def test_index(index: BSBIIndex):
 
 
 def main():
-    BSBI_instance = BSBIIndex(data_dir="pa1-skeleton/pa1-data", output_dir="output_dir")
+    # BSBI_instance = BSBIIndex(data_dir="pa1-skeleton/pa1-data", output_dir="output_dir")
     # BSBI_instance.index()
-    test_index(BSBI_instance)
+    # test_index(BSBI_instance)
     
-    BSBI_instance.retrieve("we are")
+    # BSBI_instance.retrieve("we are")
    
     BSBI_instance_compressed = BSBIIndex(
         data_dir="pa1-skeleton/pa1-data",
