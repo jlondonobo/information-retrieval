@@ -9,3 +9,4 @@ __pycache__
 .DS_Store
 output_dir/
 .vscode
+output_dir_compressed
