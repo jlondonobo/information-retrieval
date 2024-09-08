@@ -43,7 +43,7 @@ class CompressedPostings:
     # If you need any extra helper methods you can add them here
     @staticmethod
     def vb_encode_number(n: int) -> array.array:
-        bytes = array.array("L")
+        bytes = array.array("B")
         while True:
             bytes.insert(0, n % 128)
             if n < 128:
@@ -68,7 +68,8 @@ class CompressedPostings:
             Bytes reprsentation of the compressed postings list
             (as produced by `array.tobytes` function)
         """
-        gaps = CompressedPostings.vb_encode_number(postings_list[0])
+        gaps = array.array("B")
+        gaps.extend(CompressedPostings.vb_encode_number(postings_list[0]))
         for i in range(1, len(postings_list)):
             gap = postings_list[i] - postings_list[i - 1]
             gaps.extend(CompressedPostings.vb_encode_number(gap))
