@@ -1,4 +1,5 @@
 import os
+import time
 
 from BSBI.BSBI import BSBIIndex
 from BSBI.postings import CompressedPostings
@@ -18,22 +19,24 @@ def test_index(index: BSBIIndex):
 
 
 def main():
-    # BSBI_instance = BSBIIndex(data_dir="pa1-skeleton/pa1-data", output_dir="output_dir")
+    import timeit
+
+    BSBI_instance = BSBIIndex(data_dir="pa1-skeleton/pa1-data", output_dir="output_dir")
     # BSBI_instance.index()
     # test_index(BSBI_instance)
     
-    # BSBI_instance.retrieve("we are")
+    search_time = timeit.timeit(lambda: BSBI_instance.retrieve("we are"), number=100)
+    print(f"Search time: {search_time}")
    
     BSBI_instance_compressed = BSBIIndex(
         data_dir="pa1-skeleton/pa1-data",
         output_dir="output_dir_compressed",
         postings_encoding=CompressedPostings,
     )
-    BSBI_instance_compressed.index()
-    test_index(BSBI_instance_compressed)
-    
-    BSBI_instance_compressed.retrieve("we are")
-
+    # BSBI_instance_compressed.index()
+    # test_index(BSBI_instance_compressed)
+    search_time_compressed = timeit.timeit(lambda: BSBI_instance_compressed.retrieve("we are"), number=100)
+    print(f"Search time (compressed): {search_time_compressed}")
 
 if __name__ == "__main__":
     main()
