@@ -1,3 +1,4 @@
+import math
 from collections import Counter
 from pathlib import Path
 
@@ -18,6 +19,11 @@ def language_model(tmp_corpus_dir: Path):
     return LanguageModel(corpus_dir=tmp_corpus_dir)
 
 
+@pytest.fixture
+def real_language_model():
+    return LanguageModel(corpus_dir=Path("pa2-data/corpus"))
+
+
 def test_initialization(tmp_corpus_dir: Path):
     model = LanguageModel(corpus_dir=tmp_corpus_dir)
 
@@ -29,3 +35,24 @@ def test_initialization(tmp_corpus_dir: Path):
     assert model.unigram_counts == unigram_counts
     assert model.bigram_counts == bigram_counts
     assert model.total_num_tokens == 6
+
+
+def test_full_corpus_init(real_language_model: LanguageModel):
+    assert len(real_language_model.unigram_counts) == 347071
+    assert len(real_language_model.bigram_counts) == 4497257
+    assert real_language_model.total_num_tokens == 25498340
+
+
+def test_logprobs(real_language_model: LanguageModel):
+    query_wo_typo = "stanford university"
+    query_w_typo = "stanfrod universit"
+
+    p_wo_typo = math.exp(real_language_model.get_query_logp(query_wo_typo))
+    p_w_typo = math.exp(real_language_model.get_query_logp(query_w_typo))
+    print('P("{}") == {}'.format(query_wo_typo, p_wo_typo))
+    print('P("{}") == {}'.format(query_w_typo, p_w_typo))
+    assert (
+        p_wo_typo >= p_w_typo
+    ), 'Are you sure "{}" should be assigned higher probability than "{}"?'.format(
+        query_w_typo, query_wo_typo
+    )

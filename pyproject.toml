@@ -4,7 +4,7 @@ description = ""
 name = "BSBI"
 readme = "README.md"
 version = "0.1.0"
-packages = [{include = "BSBI"}]
+packages = [{include = "BSBI"}, {include = "spelling_corrector"}]
 
 
 [tool.poetry.dependencies]

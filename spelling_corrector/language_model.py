@@ -1,5 +1,8 @@
+import math
 from collections import Counter
 from pathlib import Path
+
+from tqdm import tqdm
 
 
 class LanguageModel:
@@ -24,7 +27,7 @@ class LanguageModel:
         self.unigram_counts = Counter()  # Maps strings w_1 -> count(w_1)
         self.bigram_counts = Counter()  # Maps tuples (w_1, w_2) -> count((w_1, w_2))
 
-        for file in corpus_dir.iterdir():
+        for file in tqdm(corpus_dir.iterdir()):
             tokens = file.read_text().split()
             unigrams = tokens
             bigrams = [(tokens[i], tokens[i + 1]) for i in range(len(tokens) - 1)]
@@ -32,3 +35,53 @@ class LanguageModel:
             self.total_num_tokens += len(tokens)
             self.unigram_counts.update(unigrams)
             self.bigram_counts.update(bigrams)
+
+    def get_unigram_logp(self, unigram: str) -> float:
+        """Computes the log-probability of `unigram` under this `LanguageModel`.
+
+        Args:
+            unigram (str): Unigram for which to compute the log-probability.
+
+        Returns:
+            log_p (float): Log-probability of `unigram` under this
+                `LanguageModel`.
+        """
+        prob = self.unigram_counts[unigram] / self.total_num_tokens
+        return math.log(prob)
+
+    def get_bigram_logp(self, w_1: str, w_2: str) -> float:
+        """Computes the log-probability of `unigram` under this `LanguageModel`.
+
+        Note:
+            Use self.lambda_ for the unigram-bigram interpolation factor.
+
+        Args:
+            w_1 (str): First word in bigram.
+            w_2 (str): Second word in bigram.
+
+        Returns:
+            log_p (float): Log-probability of `bigram` under this
+                `LanguageModel`.
+        """
+        prob_seq = self.bigram_counts[(w_1, w_2)] / self.unigram_counts[w_1]
+        prob_uni = self.unigram_counts[w_2] / self.total_num_tokens
+
+        interpolation = self.lambda_ * prob_uni + (1 - self.lambda_) * prob_seq
+        return math.log(interpolation)
+
+    def get_query_logp(self, query: str) -> float:
+        """Computes the log-probability of `query` under this `LanguageModel`.
+
+        Args:
+            query (str): Whitespace-delimited sequence of terms in the query.
+
+        Returns:
+            log_p (float): Log-probability assigned to the query under this
+                `LanguageModel`.
+        """
+        tokens = query.split()
+
+        probs = self.get_unigram_logp(tokens[0])
+        for i in range(1, len(tokens)):
+            probs += self.get_bigram_logp(tokens[i - 1], tokens[i])
+        return probs
