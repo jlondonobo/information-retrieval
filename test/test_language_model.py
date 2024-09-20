@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pytest
 
+from spelling_corrector.candidate_generator import CandidateGenerator
+from spelling_corrector.edit_probability_model import UniformEditProbabilityModel
 from spelling_corrector.language_model import LanguageModel
 
 
@@ -22,6 +24,18 @@ def language_model(tmp_corpus_dir: Path):
 @pytest.fixture
 def real_language_model():
     return LanguageModel(corpus_dir=Path("pa2-data/corpus"))
+
+
+@pytest.fixture
+def edit_probability_model():
+    return UniformEditProbabilityModel()
+
+
+@pytest.fixture
+def candidate_generator(
+    real_language_model, edit_probability_model
+) -> CandidateGenerator:
+    return CandidateGenerator(lm=real_language_model, epm=edit_probability_model)
 
 
 def test_initialization(tmp_corpus_dir: Path):
@@ -56,3 +70,33 @@ def test_logprobs(real_language_model: LanguageModel):
     ), 'Are you sure "{}" should be assigned higher probability than "{}"?'.format(
         query_w_typo, query_wo_typo
     )
+
+
+def test_edit_model(edit_probability_model):
+    EDIT_PROB = 0.05
+
+    # Test a basic edit
+    edited, original = "stanfrod", "stanford"
+    assert math.isclose(
+        edit_probability_model.get_edit_logp(edited, original), math.log(EDIT_PROB)
+    )
+    # Test a non-edit
+    assert math.isclose(
+        edit_probability_model.get_edit_logp(original, original),
+        math.log(1.0 - EDIT_PROB),
+    )
+
+
+def test_candidate_generator(candidate_generator):
+    query = "stanford university"
+    num_candidates = 0
+    did_generate_original = False
+    for candidate, candidate_logp in candidate_generator.get_candidates(query):
+        num_candidates += 1
+        if candidate == query:
+            did_generate_original = True
+
+        assert candidate_generator.get_num_oov(query) == 0
+
+    assert 1e2 <= num_candidates <= 1e4
+    assert did_generate_original
