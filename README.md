@@ -1,1 +1,1 @@
-# Stanford CS276
+# Information Retrieval

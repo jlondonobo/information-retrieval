@@ -1,8 +1,7 @@
-pa1-data/
-pa2-data/
+*-data/
+*-skeleton.ipynb
 toy-data
 toy_output_dir
-pa1-skeleton/pa1-data.zip
 dev_output
 dev_queries
 __pycache__
@@ -11,4 +10,5 @@ __pycache__
 output_dir/
 .vscode
 output_dir_compressed
-*.ipynb
+main.py
+candidates.py
