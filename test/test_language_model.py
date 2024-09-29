@@ -7,6 +7,7 @@ import pytest
 from spelling_corrector.candidate_generator import CandidateGenerator
 from spelling_corrector.edit_probability_model import UniformEditProbabilityModel
 from spelling_corrector.language_model import LanguageModel
+from spelling_corrector.scorer import CandidateScorer
 
 
 @pytest.fixture
@@ -36,6 +37,11 @@ def candidate_generator(
     real_language_model, edit_probability_model
 ) -> CandidateGenerator:
     return CandidateGenerator(lm=real_language_model, epm=edit_probability_model)
+
+
+@pytest.fixture
+def candidate_scorer(real_language_model, candidate_generator) -> CandidateScorer:
+    return CandidateScorer(real_language_model, candidate_generator)
 
 
 def test_initialization(tmp_corpus_dir: Path):
@@ -100,3 +106,20 @@ def test_candidate_generator(candidate_generator):
 
     assert 1e2 <= num_candidates <= 1e4
     assert did_generate_original
+
+
+@pytest.mark.parametrize(
+    ["raw", "expected"],
+    [
+        ("stanfrod university", "stanford university"),
+        ("stanford unviersity", "stanford university"),
+        ("sanford university", "stanford university"),
+    ],
+)
+def test_scorer(
+    raw: str,
+    expected: str,
+    candidate_scorer: CandidateScorer,
+):
+    corrected = candidate_scorer.correct_spelling(raw)
+    assert corrected == expected
